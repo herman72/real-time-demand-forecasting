@@ -17,3 +17,6 @@ __pycache__/
 
 # Mac files
 .DS_Store
+
+# airflow files
+logs/
