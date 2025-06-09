@@ -1,0 +1,59 @@
+name: "Terraform CI"
+
+# This workflow runs on pushes to the main branch or on pull requests,
+# but only if files in the '01-infrastructure/' directory have changed.
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - '01-infrastructure/**'
+  pull_request:
+    paths:
+      - '01-infrastructure/**'
+
+jobs:
+  terraform:
+    name: "Terraform Quality Check"
+    runs-on: ubuntu-latest
+    
+    # Define the working directory for all Terraform commands
+    defaults:
+      run:
+        working-directory: ./01-infrastructure
+
+    steps:
+      # Step 1: Check out repository code so the workflow can access it
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      # Step 2: Install and set up the Terraform CLI
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+
+      # Step 3: Configure AWS credentials for Terraform
+      # It securely uses the secrets added in the previous step
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: eu-north-1
+
+      # Step 4: Initialize Terraform
+      # This downloads the necessary providers (e.g., AWS provider)
+      - name: Terraform Init
+        id: init
+        run: terraform init
+
+      # Step 5: Check code formatting
+      # This ensures code follows standard Terraform style conventions
+      - name: Terraform Format Check
+        id: fmt
+        run: terraform fmt -check -recursive
+
+      # Step 6: Validate the Terraform configuration
+      # This checks for syntax errors in code
+      - name: Terraform Validate
+        id: validate
+        run: terraform validate
