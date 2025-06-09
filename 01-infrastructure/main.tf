@@ -48,8 +48,8 @@ module "eks" {
 
   eks_managed_node_groups = {
     general = {
-      min_size     = 1
-      max_size     = 3
+      min_size       = 1
+      max_size       = 3
       instance_types = ["t3.medium"]
     }
   }
@@ -89,7 +89,7 @@ resource "aws_iam_role" "s3_access_role" {
         Effect = "Allow"
         Principal = {
           # This would be updated later with the ARN of the service needing access
-          Service = "ec2.amazonaws.com" 
+          Service = "ec2.amazonaws.com"
         }
       },
     ]
